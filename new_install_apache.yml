@@ -23,6 +23,20 @@
   become: true
   tasks:
 
+  - name: install unzip
+    package:
+      name: unzip
+
+  - name: intall terraform
+    unarchive:
+      src: https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+ 
+
   - name: install apache and php package on Ubuntu
     tags: apache,apache2,ubuntu
     apt:
