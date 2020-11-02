@@ -2,73 +2,29 @@
 
 - hosts: all
   become: true
-  tasks:
+  pre_tasks:
 
   - name: Update repo cache (Ubuntu)
     tags: always
     apt:
-       update_cache: yes
-    changed_when: flase
+      update_cache: yes
+    changed_when: false
     when: ansible_distribution == "Ubuntu"
 
   - name: Update repo cache (Centos)
     tags: always
     dnf:
-       update_cache: yes
+      update_cache: yes
     changed_when: false
     when: ansible_distribution == "CentOS"
-     
 
-- hosts: web_server
+
+- hosts: all
   become: true
-  tasks:
+  roles:
+    - base
 
-  - name: install unzip
-    package:
-      name: unzip
-
-  - name: intall terraform
-    unarchive:
-      src: https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
-      dest: /usr/local/bin
-      remote_src: yes
-      mode: 0755
-      owner: root
-      group: root
-
-
-  - name: add ssh key for simone
-    tags: always
-    authorized_key:
-      user: simone
-      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDy8dIuKEQUMR3d2RBAeSfVYtxCw1DWc/42AUyGlRGxx ansible Def"
-
-
-  - name: install apache and php package on Ubuntu
-    tags: apache,apache2,ubuntu
-    apt:
-      name:
-        - apache2
-        - libapache2-mod-php
-      state: latest
-      
-    when: ansible_distribution == "Ubuntu"
-
-  - name: install apache and php package on Centos
-    tags: apache,centos,httpd
-    dnf:
-      name:
-        - httpd             
-        - php
-      state: latest
-   
-    when: ansible_distribution == "CentOS"
-
-  - name: Copy default html files for site
-    tags: apache,apache2,httpd
-    copy:
-      src: index.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644
+- hosts: web_servers
+  become: true
+  roles:
+    - web_servers 
